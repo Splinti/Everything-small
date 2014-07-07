@@ -9,7 +9,7 @@ set "quality="
 :START
 cls
 echo What service do you want to use?
-echo ( TwitchTV, Custom media [More coming] )
+echo ( TwitchTV, Custom [More coming] )
 set /p "service="
 if /i "%service%" == "" (
 	cls
