@@ -1,4 +1,4 @@
-require 'Socket'
+﻿require 'Socket'
 $port = 80
 $id = 1
 
@@ -80,31 +80,30 @@ def mpmenu
 	end
 end
 
-def connect(hostname = nil)
-	$hostname = hostname
+def connect
+	$id = 2
 	system("cls")
 	design("Mehrspieler")
 	puts
 	puts "Gebe die " + "IP-Adresse".green + " oder den " + "PC-Namen".green + " deines Mitspielers an."
 	puts "Format: " + "127.0.0.1".green + " / " + "COMPUTER1".green
 	puts "Schreibe " + "EXIT".red + " zum Abbrechen"
-	if $hostname == nil
-		print "-> "
-		$hostname = gets.chop
-	else
-		puts "-> #{$hostname}"
-	end
+	print "-> "
+	$hostname = gets.chop
 	if $hostname == "EXIT"
 		home
 	end
-	begin
+	besgin
+		puts $hostname
+		
 		s = TCPSocket.open($hostname,$port)
+		puts "Connected"
 	rescue
 		puts "Verbindung fehlgeschlagen!"
 		puts "erneut versuchen? ja/nein"
 		eingabe = gets.chop
 		if eingabe == "ja"
-			connect($hostname)
+			connect
 		else
 			home
 		end
@@ -112,12 +111,12 @@ def connect(hostname = nil)
 	while line = s.gets
 		$id = line.chop
 	end
-	$hostname = hostname
 	s.close
 	startmp($id)
 end
 
 def startsv
+	$id = 1
 	ip = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[0][3]
 	system("cls")
 	design("Mehrspieler")
@@ -130,6 +129,7 @@ def startsv
 	server = TCPServer.open($port)
 	client = server.accept
 	client.puts $id+1
+	$hostname = client.remote_address.ip_unpack[0].to_s.gsub(/%[1-9]/,"")
 	client.close
 	server.close
 	startmp($id)
