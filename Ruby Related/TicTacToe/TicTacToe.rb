@@ -80,14 +80,15 @@ def mpmenu
 	end
 end
 
-def connect($hostname = nil)
+def connect(hostname = nil)
+	$hostname = hostname
 	system("cls")
 	design("Mehrspieler")
 	puts
 	puts "Gebe die " + "IP-Adresse".green + " oder den " + "PC-Namen".green + " deines Mitspielers an."
 	puts "Format: " + "127.0.0.1".green + " / " + "COMPUTER1".green
 	puts "Schreibe " + "EXIT".red + " zum Abbrechen"
-	if hostname == nil
+	if $hostname == nil
 		print "-> "
 		$hostname = gets.chop
 	else
