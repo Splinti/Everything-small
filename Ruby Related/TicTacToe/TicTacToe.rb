@@ -94,7 +94,7 @@ def connect(hostname = nil)
 	else
 		puts "-> #{$hostname}"
 	end
-	if hostname == "EXIT"
+	if $hostname == "EXIT"
 		home
 	end
 	begin
