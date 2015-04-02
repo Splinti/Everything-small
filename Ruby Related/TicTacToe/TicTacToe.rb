@@ -80,7 +80,7 @@ def mpmenu
 	end
 end
 
-def connect(hostname = nil)
+def connect($hostname = nil)
 	system("cls")
 	design("Mehrspieler")
 	puts
