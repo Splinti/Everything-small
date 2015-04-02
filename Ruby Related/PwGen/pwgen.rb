@@ -1,19 +1,34 @@
+def design(str)
+	hash = "#"
+	max = 30
+	if str.length%2 == 0
+		spaces = ((max-str.length)/2)-1
+		spaces2 = ((max-str.length)/2)-1
+	else
+		spaces = ((max-str.length)/2)
+		spaces2 = ((max-str.length)/2)-1
+	end
+	puts hash*max
+	puts hash + " "*(max-2) + hash
+	puts hash + " "*(max-2) + hash
+	puts hash + " "*spaces + str + " "*spaces2 + hash
+	puts hash + " "*(max-2) + hash
+	puts hash + " "*(max-2) + hash
+	puts hash*max
+end
+
 system("cls")
 @dontbreak = false
 @symbols = Array.new
 
-interface =     "#############################" \
-			+ "\n#                           #" \
-			+ "\n#       Passwort Gen        #" \
-			+ "\n#                           #" \
-			+ "\n#############################"
-
-puts interface
+design("PwGen")
 puts "Language? Available:"
 puts "- de"
 puts "- en"
 @lang = gets().to_s
 system("cls")
+
+
 
 begin
 	require_relative 'language.rb'
@@ -25,12 +40,12 @@ rescue
 end
 
 
-puts interface
+design("PwGen")
 puts @string_Start_Question1
 @length = gets().to_i
 
 system("cls")
-puts interface
+design("PwGen")
 puts @string_symbol_Question1
 puts @string_symbol_Hint1
 puts "1: A-Z"
@@ -59,7 +74,7 @@ until @dontbreak
 	end
 end
 system("cls")
-puts interface
+design("PwGen")
 puts 
 while @length > 0
 	@length = @length.to_i - 1
