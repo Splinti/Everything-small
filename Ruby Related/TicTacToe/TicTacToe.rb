@@ -89,7 +89,7 @@ def connect(hostname = nil)
 	puts "Schreibe " + "EXIT".red + " zum Abbrechen"
 	if hostname == nil
 		print "-> "
-		hostname = gets.chop
+		$hostname = gets.chop
 	else
 		puts "-> #{$hostname}"
 	end
@@ -97,13 +97,13 @@ def connect(hostname = nil)
 		home
 	end
 	begin
-		s = TCPSocket.open(hostname,$port)
+		s = TCPSocket.open($hostname,$port)
 	rescue
 		puts "Verbindung fehlgeschlagen!"
 		puts "erneut versuchen? ja/nein"
 		eingabe = gets.chop
 		if eingabe == "ja"
-			connect(hostname)
+			connect($hostname)
 		else
 			home
 		end
