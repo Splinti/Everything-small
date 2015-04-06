@@ -5,7 +5,7 @@ require 'teamspeak-ruby'
 @afkid = 1192 # DB_ID of the AFK-Channel
 @usegroup = true # Whether to use the non-move group system or not
 @nomove = 796 # DB_ID of the non-move group
-Querypw = 'Password' # PW of the Query-Login
+@querypw = 'Password' # PW of the Query-Login
 @botname = "Splintis Bot" #Name of the bot
 @serv_ip = 'localhost'
 @serv_port = '10011'
@@ -13,8 +13,19 @@ Querypw = 'Password' # PW of the Query-Login
 
 
 # PROGRAM - DO NOT MODIFY
+
 @history = Array.new
 def checkuser
+	# Detect AFK channel
+	begin
+	tempid = @ts.command('channelfind', {'pattern' => 'AFK'})[0]['cid']
+	rescue 
+		tempid = nil
+	end
+	if not tempid.nil?
+		@afkid = tempid
+	end
+
 	while true
 		if @usegroup then @clientlist = @ts.command('servergroupclientlist', {'sgid' => @nomove}) end
 		@ts.command('clientlist').each do |user|
@@ -49,6 +60,7 @@ def checkuser
 		end
 		if not @history.empty?
 			checkstatus
+			puts @history
 		end
 	end
 end
@@ -82,7 +94,7 @@ end
 
 
 @ts = Teamspeak::Client.new(@serv_ip,@serv_port)
-@ts.login('serveradmin', Querypw)
+@ts.login('serveradmin', @querypw)
 @ts.command('use', {'sid' => 1})
 @ts.command('clientupdate', {'client_nickname' => @botname})
 checkuser
