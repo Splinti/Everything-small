@@ -27,7 +27,7 @@ def ausgabe(x)
 	y = Array.new
 	x.each do |stat|
 		if stat == "X"
-			y += [stat.cyan]
+			y += [stat.green]
 		elsif stat == "O"
 			y += [stat.red]
 		else
@@ -35,13 +35,13 @@ def ausgabe(x)
 		end
 	end
 	y.flatten
-	puts "╔═══╦═══╦═══╗".green
-	puts "║ ".green + y[0] + " ║ ".green + y[1] + " ║ ".green + y[2] + " ║".green
-	puts "╠═══╬═══╬═══╣".green
-	puts "║ ".green + y[3] + " ║ ".green + y[4] + " ║ ".green + y[5] + " ║".green
-	puts "╠═══╬═══╬═══╣".green
-	puts "║ ".green + y[6] + " ║ ".green + y[7] + " ║ ".green + y[8] + " ║".green
-	puts "╚═══╩═══╩═══╝".green
+	puts "╔═══╦═══╦═══╗".cyan
+	puts "║ ".cyan + y[0] + " ║ ".cyan + y[1] + " ║ ".cyan + y[2] + " ║".cyan
+	puts "╠═══╬═══╬═══╣".cyan
+	puts "║ ".cyan + y[3] + " ║ ".cyan + y[4] + " ║ ".cyan + y[5] + " ║".cyan
+	puts "╠═══╬═══╬═══╣".cyan
+	puts "║ ".cyan + y[6] + " ║ ".cyan + y[7] + " ║ ".cyan + y[8] + " ║".cyan
+	puts "╚═══╩═══╩═══╝".cyan
 end
 
 def design(str)
@@ -93,7 +93,7 @@ def connect
 	if $hostname == "EXIT"
 		home
 	end
-	besgin
+	begin
 		puts $hostname
 		
 		s = TCPSocket.open($hostname,$port)
