@@ -118,6 +118,8 @@ end
 def startsv
 	$id = 1
 	system("cls")
+	design("Mehrspieler")
+	puts
 	puts "Soll in einem LAN gespielt werden?"
 	puts "1 - ja"
 	puts "2 - nein"
