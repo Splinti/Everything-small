@@ -117,19 +117,32 @@ end
 
 def startsv
 	$id = 1
+	system("cls")
+	puts "Soll in einem LAN gespielt werden?"
+	puts "1 - ja"
+	puts "2 - nein"
+	lan = gets.to_i
 	ip = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[0][3]
 	system("cls")
 	design("Mehrspieler")
 	puts
 	puts "Lasse deinen Mehrspieler-Partner mit deinem Spiel verbinden."
-	puts "IP zum Verbinden: #{ip.green}"
-	puts "Hostname: #{Socket.gethostname.green}"
+	if lan == 1
+	    puts "Hostname: #{Socket.gethostname.green}"
+		puts "IP zum Verbinden: #{ip.green}"
+	elsif lan == 2
+		puts "IP zum Verbinden: #{ip.green}"
+	end
 	puts "STRG + C".red + " zum Abbrechen"
 	puts "Warte auf Verbindung..."
 	server = TCPServer.open($port)
 	client = server.accept
+	if lan == 1
+		$hostname = client.remote_address.getnameinfo[0]
+	elsif lan == 2
+		$hostname = client.remote_address.ip_unpack[0].to_s.gsub(/%[1-9]/,"")
+	end
 	client.puts $id+1
-	$hostname = client.remote_address.ip_unpack[0].to_s.gsub(/%[1-9]/,"")
 	client.close
 	server.close
 	startmp($id)
@@ -171,16 +184,17 @@ def startmp(id)
 	#File.new("highscore.txt","r")
 	@array = ["1","2","3","4","5","6","7","8","9"]
 	$wins = ""
-	maxturn = 5
 	x = 0
 	ueber = false
 	$id = $id.to_i
 	if $id == 1
 		turn = "X"
 		opp = "O"
+		maxturn = 5
 	else
 		turn = "O"
 		opp = "X"
+		maxturn = 4
 	end
 	array = @array
 	while $wins.chop == ""
