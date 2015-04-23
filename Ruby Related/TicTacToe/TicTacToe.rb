@@ -134,6 +134,10 @@ def startsv
 		puts "IP zum Verbinden: #{ip.green}"
 	elsif lan == 2
 		puts "IP zum Verbinden: #{ip.green}"
+	else
+		puts "Verfügbare Auswahl: 1-2"
+		sleep(2)
+		startsv
 	end
 	puts "STRG + C".red + " zum Abbrechen"
 	puts "Warte auf Verbindung..."
@@ -178,17 +182,21 @@ def sendmsg(integer)
 end
 
 def startmp(id)
-	#begin
-	#	File.new("highscore.txt", "r")
-	#rescue
-	#	File.new("highscore.txt", "w")
-	#end
-	#File.new("highscore.txt","r")
+	begin
+		File.new("highscore.txt", "r")
+	rescue
+		File.new("highscore.txt", "w")
+	end
+	File.new("highscore.txt","r")
 	@array = ["1","2","3","4","5","6","7","8","9"]
 	$wins = ""
 	x = 0
 	ueber = false
 	$id = $id.to_i
+	system("cls")
+	design("Mehrspieler")
+	puts "Wie soll dein Name lauten?"
+	username = gets.chop
 	if $id == 1
 		turn = "X"
 		opp = "O"
@@ -217,15 +225,16 @@ def startmp(id)
 				end
 			end
 		else
-			#if turn2 == name1 then turn2 = name2 else turn2 = name1 end
-			#if turn2 == name1
-			#	writebest(name1,1,0)
-			#	writebest(name2,0,1)
-			#else
-			#	writebest(name1,0,1)
-			#	writebest(name2,1,0)
-			#end
-			puts "#{$wins} hat das Spiel gewonnen!"
+			design("Mehrspieler")
+			if $wins == turn
+				writebest(username,1,0)
+				puts
+				puts "Du hat das Spiel gewonnen!"
+			else
+				writebest(username,0,1)
+				puts
+				puts "Dein Gegner hat das Spiel gewonnen!"
+			end
 			puts "Noch eine Runde spielen? ja/nein"
 			eingabe = gets.chop
 			if eingabe == "ja"
@@ -236,7 +245,7 @@ def startmp(id)
 		end
 		if $id == 1
 			ausgabe(@array)
-			puts "#{turn} ist am Zug."
+			puts "Du bist am Zug!"
 			puts "Welches Feld soll gesetzt werden?"
 			print "Eingabe: "
 			eingabe = gets.chop
@@ -262,13 +271,22 @@ def startmp(id)
 			$wins = check(@array,turn)
 			if $wins == ""
 				ausgabe(@array)
-				puts "Auf Gegner warten."
+				puts "Dein Gegner ist am Zug!"
 				@array = setzen(@array,waitformsg.to_i,opp)
 				system("cls")
 				ausgabe(@array)
 				$id = 1
 			else
-				puts "#{$wins} hat das Spiel gewonnen!"
+				design("Mehrspieler")
+				if $wins == turn
+					writebest(username,1,0)
+					puts
+					puts "Du hast das Spiel gewonnen!"
+				else
+					writebest(username,0,1)
+					puts
+					puts "Dein Gegner hat das Spiel gewonnen!"
+				end
 				puts "Noch eine Runde spielen? ja/nein"
 				eingabe = gets.chop
 				if eingabe == "ja"
@@ -305,11 +323,8 @@ end
 
 def addtable(array)
 	maxTab = 15
-	begin
-		kd = (array[1].to_f/array[2].to_f).round(2)
-	rescue 
-		kd = array[1]
-	end
+	kd = (array[1].to_f/array[2].to_f).round(2)
+	if kd.infinite? then kd = array[1].round(2) end
 	puts array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
 end
 
@@ -402,7 +417,7 @@ def home
 		system("cls")
 		exit
 	else
-		puts "Verfügbare Eingabe: 0-2"
+		puts "Verfügbare Eingabe: 0-3"
 		sleep(1)
 		home
 	end
