@@ -69,11 +69,16 @@ def mpmenu
 	puts
 	puts "1 - Zum Server verbinden"
 	puts "2 - Server erstellen"
+	puts
+	puts "0 - Zurueck"
+	print "Eingabe: "
 	eingabe = gets.to_i
 	if eingabe == 1
 		connect
 	elsif eingabe == 2
 		startsv
+	elsif eingabe == 0
+		home
 	else
 		puts "Verfügbare Eingabe: 1-2"
 		mpmenu
@@ -203,21 +208,89 @@ def check(arr,name)
 	   return "" end
 end
 
-def addtable(array)
+def addtable(array,del = false)
 	maxTab = 15
 	kd = (array[1].to_f/array[2].to_f).round(2)
 	if kd.infinite? then kd = array[1].to_f.round(2) end
-	puts array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
+	if del
+		$counter += 1
+		puts $counter.to_s + " "*(maxTab-$counter.to_s.length) + " | " + array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
+	else
+		puts array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
+	end
 end
 
-def showbest
+def bestmenu
+	system("cls")
+	design("Bestenliste - Menue")
+	puts
+	puts "1 - Bestenliste anzeigen"
+	puts "2 - Bestenlisten-eintrag loeschen"
+	puts
+	puts "0 - Zurueck"
+	print "Eingabe: "
+	eingabe = gets.to_i
+	if eingabe == 0
+		home
+	elsif eingabe == 1
+		showbest
+	elsif eingabe == 2
+		modifybest
+	else
+		puts "Verfügbare Eingabe 0-2"
+		sleep(1)
+		bestmenu
+	end
+end
+
+def modifybest
+	system("cls")
+	$counter = 0
+	@sorted = Array.new
+	y = 0
+	x = 0
+	design("Bestenliste")
+	puts
+	puts "ID              | Name            | Gewonnen        | Verloren"
+	puts "-"*((20*4)-1)
+	highscores = File.new("highscore.txt","r")
+	list = highscores.readlines
+	highscores.close
+	files = list.flatten
+	files.each do |stat|
+    	@sorted = @sorted + [stat.to_s.split(",")]
+		addtable(@sorted[y], true)
+		y += 1
+	end
+	puts
+	puts "Gebe die ID eines Benutzers ein"
+	puts "Zurueck mit " + "EXIT".red
+	eingabe = gets.chop
+	if eingabe == "EXIT"
+		bestmenu
+	elsif eingabe =~ /[0-9]/
+		list.delete_at(eingabe.to_i-1)
+		savefile(list)
+	else
+		modifybest
+	end
+end
+
+def savefile(array)
+	file = File.new("highscore.txt","w")
+	file.puts array
+	file.close
+	modifybest
+end
+
+def showbest(dest = 0)
 	system("cls")
 	@sorted = Array.new
 	y = 0
 	x = 0
 	design("Bestenliste")
 	puts
-	puts "Name            | Gewonnen        | Verloren        | Gewinnrate      "
+	puts "Name            | Gewonnen        | Verloren        | Gewinnrate"
 	puts "-"*((20*4)-1)
 	highscores = File.new("highscore.txt","r")
 	list = highscores.readlines
@@ -231,7 +304,7 @@ def showbest
 	puts
 	puts "Zurueck mit beliebiger Taste"
 	gets
-	home
+	bestmenu
 end
 
 def names(player)
@@ -503,9 +576,7 @@ def startgame(cpu = false)
 				end
 			end
 		else
-			#if !cpu
-				if turn2 == name1 then turn2 = name2 else turn2 = name1 end
-			#end
+			if turn2 == name1 then turn2 = name2 else turn2 = name1 end
 			if turn2 == name1
 				writebest(name1,1,0)
 				writebest(name2,0,1)
@@ -575,14 +646,14 @@ def home
 	puts "3 - Bestenliste"
 	puts
 	puts "0 - Spiel beenden"
-	puts "Eingabe: "
+	print "Eingabe: "
 	eingabe = gets.chop
 	if eingabe == "1"
 		menu1
 	elsif eingabe == "2"
 		mpmenu
 	elsif eingabe == "3"
-		showbest
+		bestmenu
 	elsif eingabe == "0"
 		system("cls")
 		exit
