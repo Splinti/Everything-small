@@ -1,4 +1,4 @@
-﻿require 'Socket'
+require 'Socket'
 $port = 80
 $id = 1
 
@@ -26,9 +26,9 @@ end
 def ausgabe(x)
 	y = Array.new
 	x.each do |stat|
-		if stat == "X"
+		if stat == $ply1sym
 			y += [stat.green]
-		elsif stat == "O"
+		elsif stat == $ply2sym
 			y += [stat.red]
 		else
 			y += [stat]
@@ -181,6 +181,154 @@ def sendmsg(integer)
 	server.close
 end
 
+def setzen(arr,pos,name)
+	arr[pos-1] = name
+	return arr
+end
+
+def check(arr,name)
+	#waagerecht
+	if arr[0] == name && arr[1] == name && arr[2] == name then return name elsif
+	   arr[3] == name && arr[4] == name && arr[5] == name then return name elsif
+	   arr[6] == name && arr[7] == name && arr[8] == name then return name elsif
+
+	#senkrecht
+	   arr[0] == name && arr[3] == name && arr[6] == name then return name elsif
+	   arr[1] == name && arr[4] == name && arr[7] == name then return name elsif
+	   arr[2] == name && arr[5] == name && arr[8] == name then return name elsif
+
+	#diagonal
+	   arr[0] == name && arr[4] == name && arr[8] == name then return name elsif
+	   arr[2] == name && arr[4] == name && arr[6] == name then return name else
+	   return "" end
+end
+
+def addtable(array)
+	maxTab = 15
+	kd = (array[1].to_f/array[2].to_f).round(2)
+	if kd.infinite? then kd = array[1].to_f.round(2) end
+	puts array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
+end
+
+def showbest
+	system("cls")
+	@sorted = Array.new
+	y = 0
+	x = 0
+	design("Bestenliste")
+	puts
+	puts "Name            | Gewonnen        | Verloren        | Gewinnrate      "
+	puts "-"*((20*4)-1)
+	highscores = File.new("highscore.txt","r")
+	list = highscores.readlines
+	highscores.close
+	files = list.flatten
+	files.each do |stat|
+    	@sorted = @sorted + [stat.to_s.split(",")]
+		addtable(@sorted[y])
+		y += 1
+	end
+	puts
+	puts "Zurueck mit beliebiger Taste"
+	gets
+	home
+end
+
+def names(player)
+	system("cls")
+	design("Spielernamen")
+	puts
+	print "Spieler 1: "
+	name1 = gets
+	if player == 2
+		print "Spieler 2: "
+		name2 = gets
+		return name1,name2
+	else
+		return name1
+	end
+end
+
+def menu1
+	system("cls")
+	name = ""
+	design("Gegnerwahl")
+	puts
+	puts "1 - Spieler vs Spieler"
+	puts "2 - Spieler vs Computer"
+	puts ""
+	puts "0 - Zurueck"
+	print "Eingabe: "
+	eingabe = gets.chop
+
+	if eingabe == "1"
+		startgame
+	elsif eingabe == "2"
+		startgame(true)
+	elsif eingabe == "0"
+		home
+	else
+		puts "Verfügbare Eingabe: 0-2"
+		sleep(1)
+		menu1
+	end
+end
+
+def cputurn(arr,eingabe,maxturn)
+	done = false
+	if maxturn <= 4
+	until done
+		pos = rand(1..9)
+		system("cls")
+		if @array[pos-1] == $ply1sym
+			done = false
+		else
+			if @array[pos-1] == $ply2sym
+			else
+				if pos == eingabe.to_i
+				else
+					setzen(@array,pos,$ply2sym)
+					done = true
+				end
+			end
+		end
+	end
+	return arr
+	end
+end
+
+def writebest(name,win,loss)
+  	a = File.new("highscore.txt", "r")
+  	list = a.readlines
+  	a.close
+  	x = list.index{|e| e =~ /#{Regexp.quote(name)}.*/ }
+  	unless x.nil?
+  		new = list[x].split(",")
+  		list = list + [new[0].to_s + "," + (new[1].to_i+win).to_s + "," + (new[2].to_i+loss).to_s]
+  		list.delete_at(x)
+  	else
+ 		list = list + [name.to_s + "," + win.to_s + "," + loss.to_s]
+  	end
+  	b = File.new("highscore.txt", "w")
+  	b.puts list
+  	b.close
+end
+
+def symbol(players)
+	system("cls")
+	design("Symbolauswahl")
+	puts
+	if players == 1
+		puts "Was für ein Symbol möchtest du benutzen?"
+		$ply1sym = gets.chop
+	elsif players == 2
+		print "Spieler 1: "
+		$ply1sym = gets.chop
+		print "Spieler 2: "
+		$ply2sym = gets.chop
+	end
+end
+
 def startmp(id)
 	begin
 		File.new("highscore.txt", "r")
@@ -198,12 +346,12 @@ def startmp(id)
 	puts "Wie soll dein Name lauten?"
 	username = gets.chop
 	if $id == 1
-		turn = "X"
-		opp = "O"
+		turn = $ply1sym
+		opp = $ply2sym
 		maxturn = 5
 	else
-		turn = "O"
-		opp = "X"
+		turn = $ply2sym
+		opp = $ply1sym
 		maxturn = 4
 	end
 	array = @array
@@ -250,7 +398,7 @@ def startmp(id)
 			print "Eingabe: "
 			eingabe = gets.chop
 			if eingabe.to_s =~ /[1-9]/
-				if @array[(eingabe.to_i)-1] == "X" or @array[(eingabe.to_i)-1] == "O"
+				if @array[(eingabe.to_i)-1] == $ply1sym or @array[(eingabe.to_i)-1] == $ply2sym
 					puts "Du kannst kein Feld überschreiben!"
 					ueber = true
 					sleep(1)
@@ -299,99 +447,121 @@ def startmp(id)
 	end
 end
 
-def setzen(arr,pos,name)
-	arr[pos-1] = name
-	return arr
-end
-
-def check(arr,name)
-	#waagerecht
-	if arr[0] == name && arr[1] == name && arr[2] == name then return name elsif
-	   arr[3] == name && arr[4] == name && arr[5] == name then return name elsif
-	   arr[6] == name && arr[7] == name && arr[8] == name then return name elsif
-
-	#senkrecht
-	   arr[0] == name && arr[3] == name && arr[6] == name then return name elsif
-	   arr[1] == name && arr[4] == name && arr[7] == name then return name elsif
-	   arr[2] == name && arr[5] == name && arr[8] == name then return name elsif
-
-	#diagonal
-	   arr[0] == name && arr[4] == name && arr[8] == name then return name elsif
-	   arr[2] == name && arr[4] == name && arr[6] == name then return name else
-	   return "" end
-end
-
-def addtable(array)
-	maxTab = 15
-	kd = (array[1].to_f/array[2].to_f).round(2)
-	if kd.infinite? then kd = array[1].round(2) end
-	puts array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
-end
-
-def showbest
-	system("cls")
-	@sorted = Array.new
-	y = 0
+def startgame(cpu = false)
+	begin
+		File.new("highscore.txt", "r")
+	rescue
+		File.new("highscore.txt", "w")
+	end
+	File.new("highscore.txt","r")
+	@array = ["1","2","3","4","5","6","7","8","9"]
+	$wins = ""
+	if !cpu
+		maxrounds = 9
+	else
+		maxrounds = 5
+	end
 	x = 0
-	design("Bestenliste")
-	puts
-	puts "Name            | Gewonnen        | Verloren        | Gewinnrate      "
-	puts "-"*((20*4)-1)
-	highscores = File.new("highscore.txt","r")
-	list = highscores.readlines
-	highscores.close
-	files = list.flatten
-	files.each do |stat|
-    	@sorted = @sorted + [stat.to_s.split(",")]
-		addtable(@sorted[y])
-		y += 1
-	end
-	puts
-	puts "Zurueck mit beliebiger Taste"
-	gets
-	home
-end
-
-def names(player)
-	system("cls")
-	design("Spielernamen")
-	print "Spieler1: "
-	name1 = gets
-	if player == 2
-		print "Spieler2: "
-		name2 = gets
-		return name1,name2
+	ueber = false
+	wrong = false
+	array = @array
+	if cpu
+		name1 = names(1).chop
+		name2 = "CPU"
+		maxturn = 5
+		turn2 = name1
+		symbol(1)
+		turn = $ply1sym
 	else
-		return name1
+		nam = names(2)
+		name1 = nam[0].chop
+		name2 = nam[1].chop
+		maxturn = 9
+		turn2 = name2
+		symbol(2)
+		turn = $ply2sym
 	end
-end
-
-def menu1
-	system("cls")
-	name = ""
-	design("Gegnerwahl")
-	puts
-	puts "1 - Spieler vs Spieler"
-	puts "2 - Spieler vs Computer"
-	puts ""
-	puts "0 - Zurueck"
-	print "Eingabe: "
-	eingabe = gets.chop
-
-	if eingabe == "1"
-		startgame
-	elsif eingabe == "2"
-		startgame(true)
-	elsif eingabe == "0"
-		home
-	else
-		puts "Verfügbare Eingabe: 0-2"
-		sleep(1)
-		menu1
+	while $wins.chop == ""
+		system("cls")
+		ausgabe(array)
+		if ueber == false
+			if !cpu
+				if turn == $ply1sym then turn = $ply2sym else turn = $ply1sym end
+				if turn2 == name1 then turn2 = name2 else turn2 = name1 end
+			end
+		end
+		if $wins == ""
+			if x == maxturn
+				puts "Unentschieden!"
+				puts "Noch eine Runde spielen? ja/nein"
+				eingabe = gets.chop
+				if eingabe == "ja"
+					menu1
+				else
+					system("cls")
+					home
+				end
+			end
+		else
+			#if !cpu
+				if turn2 == name1 then turn2 = name2 else turn2 = name1 end
+			#end
+			if turn2 == name1
+				writebest(name1,1,0)
+				writebest(name2,0,1)
+			else
+				writebest(name1,0,1)
+				writebest(name2,1,0)
+			end
+			if cpu then if $wins == "O" then turn2 = name2 else turn2 = name1 end end
+			puts "#{turn2} hat das Spiel gewonnen!"
+			puts "Noch eine Runde spielen? ja/nein"
+			eingabe = gets.chop
+			if eingabe == "ja"
+				menu1
+			else
+				home
+			end
+		end
+		puts "#{turn2} ist am Zug."
+		puts "Welches Feld soll gesetzt werden?"
+		print "Eingabe: "
+		eingabe = gets.chop
+		if eingabe.to_s =~ /[1-9]/
+			if @array[(eingabe.to_i)-1] == $ply1sym or @array[(eingabe.to_i)-1] == $ply2sym
+				puts "Du kannst kein Feld überschreiben!"
+				wrong = true
+				ueber = true
+				sleep(1)
+			else
+				x += 1
+				@array = setzen(array,eingabe.to_i,turn)
+				$wins = check(@array,turn)
+				wrong = false
+				ueber = false
+			end
+		else
+			puts "Verfuegbare Eingabe: 1-9"
+			ueber = true
+			wrong = true
+			sleep(1)
+		end
+		if $wins == ""
+			if cpu
+				if wrong == false
+					if turn2 == name1 then turn2 = name2 else turn2 = name1 end
+					cputurn(@array,eingabe,x)
+					$wins = check(@array,"O")
+					wrong = true
+				end
+			end
+		end
 	end
 end
 
 def home
+	$ply1sym = "X"
+	$ply2sym = "O"
 	begin
 		File.new("highscore.txt", "r")
 	rescue
@@ -423,151 +593,4 @@ def home
 	end
 end
 
-def cputurn(arr,eingabe,maxturn)
-	done = false
-	if maxturn <= 4
-	until done
-		pos = rand(1..9)
-		system("cls")
-		if @array[pos-1] == "X"
-			done = false
-		else
-			if @array[pos-1] == "O"
-			else
-				if pos == eingabe.to_i
-				else
-					setzen(@array,pos,"O")
-					done = true
-				end
-			end
-		end
-	end
-	return arr
-	end
-end
-
-def writebest(name,win,loss)
-  	a = File.new("highscore.txt", "r")
-  	list = a.readlines
-  	a.close
-  	x = list.index{|e| e =~ /#{Regexp.quote(name)}.*/ }
-  	unless x.nil?
-  		new = list[x].split(",")
-  		list = list + [new[0].to_s + "," + (new[1].to_i+win).to_s + "," + (new[2].to_i+loss).to_s]
-  		list.delete_at(x)
-  	else
- 		list = list + [name.to_s + "," + win.to_s + "," + loss.to_s]
-  	end
-  	b = File.new("highscore.txt", "w")
-  	b.puts list
-  	b.close
-end
-
-def startgame(cpu = false)
-	begin
-		File.new("highscore.txt", "r")
-	rescue
-		File.new("highscore.txt", "w")
-	end
-	File.new("highscore.txt","r")
-	@array = ["1","2","3","4","5","6","7","8","9"]
-	$wins = ""
-	if !cpu
-		maxrounds = 9
-	else
-		maxrounds = 5
-	end
-	x = 0
-	ueber = false
-	wrong = false
-	array = @array
-	if cpu
-		name1 = names(1).chop
-		name2 = "CPU"
-		maxturn = 5
-		turn2 = name1
-		turn = "X"
-	else
-		nam = names(2)
-		name1 = nam[0].chop
-		name2 = nam[1].chop
-		maxturn = 9
-		turn2 = name2
-		turn = "O"
-	end
-	while $wins.chop == ""
-		system("cls")
-		ausgabe(array)
-		if ueber == false
-			if !cpu
-				if turn == "X" then turn = "O" else turn = "X" end
-				if turn2 == name1 then turn2 = name2 else turn2 = name1 end
-			end
-		end
-		if $wins == ""
-			if x == maxturn
-				puts "Unentschieden!"
-				puts "Noch eine Runde spielen? ja/nein"
-				eingabe = gets.chop
-				if eingabe == "ja"
-					menu1
-				else
-					system("cls")
-					home
-				end
-			end
-		else
-			if !cpu
-				if turn2 == name1 then turn2 = name2 else turn2 = name1 end
-			end
-			if turn2 == name1
-				writebest(name1,1,0)
-				writebest(name2,0,1)
-			else
-				writebest(name1,0,1)
-				writebest(name2,1,0)
-			end
-			puts "#{turn2} hat das Spiel gewonnen!"
-			puts "Noch eine Runde spielen? ja/nein"
-			eingabe = gets.chop
-			if eingabe == "ja"
-				menu1
-			else
-				home
-			end
-		end
-		puts "#{turn2} ist am Zug."
-		puts "Welches Feld soll gesetzt werden?"
-		print "Eingabe: "
-		eingabe = gets.chop
-		if eingabe.to_s =~ /[1-9]/
-			if @array[(eingabe.to_i)-1] == "X" or @array[(eingabe.to_i)-1] == "O"
-				puts "Du kannst kein Feld überschreiben!"
-				wrong = true
-				ueber = true
-				sleep(1)
-			else
-				x += 1
-				@array = setzen(array,eingabe.to_i,turn)
-				$wins = check(@array,turn)
-				wrong = false
-				ueber = false
-			end
-		else
-			puts "Verfuegbare Eingabe: 1-9"
-			ueber = true
-			wrong = true
-			sleep(1)
-		end
-		if $wins == ""
-			if cpu
-				if wrong == false
-					cputurn(@array,eingabe,x)
-					$wins = check(@array,"O")
-					wrong = true
-				end
-			end
-		end
-	end
-end
 home
