@@ -521,6 +521,16 @@ def startmp(id)
 end
 
 def startgame(cpu = false)
+	if cpu
+		system("cls")
+		design("Zugauswahl")
+		puts
+		puts "Wer soll anfangen?"
+		puts "1 - Spieler"
+		puts "2 - CPU"
+		print "Eingabe: "
+		eingabe = gets.to_i
+	end
 	begin
 		File.new("highscore.txt", "r")
 	rescue
@@ -553,6 +563,9 @@ def startgame(cpu = false)
 		turn2 = name2
 		symbol(2)
 		turn = $ply2sym
+	end
+	if eingabe == 2
+		cputurn(@array,eingabe,x)
 	end
 	while $wins.chop == ""
 		system("cls")
@@ -620,7 +633,6 @@ def startgame(cpu = false)
 		if $wins == ""
 			if cpu
 				if wrong == false
-					if turn2 == name1 then turn2 = name2 else turn2 = name1 end
 					cputurn(@array,eingabe,x)
 					$wins = check(@array,"O")
 					wrong = true
