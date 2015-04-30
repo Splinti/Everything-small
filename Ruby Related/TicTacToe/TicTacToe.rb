@@ -290,7 +290,7 @@ def showbest(dest = 0)
 	x = 0
 	design("Bestenliste")
 	puts
-	puts "Name            | Gewonnen        | Verloren        | Gewinnrate"
+	puts "Name            | Gewonnen        | Verloren       | Gewinnrate"
 	puts "-"*((20*4)-1)
 	highscores = File.new("highscore.txt","r")
 	list = highscores.readlines
@@ -312,14 +312,16 @@ def names(player)
 	design("Spielernamen")
 	puts
 	print "Spieler 1: "
-	name1 = gets
+	name1 = gets.chop
 	if player == 2
 		print "Spieler 2: "
-		name2 = gets
+		name2 = gets.chop
+		symbol2(name1,name2)
 		return name1,name2
 	else
 		return name1
 	end
+	
 end
 
 def menu1
@@ -385,6 +387,25 @@ def writebest(name,win,loss)
   	b = File.new("highscore.txt", "w")
   	b.puts list
   	b.close
+end
+
+def symbol2(player1,player2)
+	if player1.length <= player2.length
+		max = player1.length
+	else
+		max = player2.length
+	end
+	puts player1
+	puts player2
+	x = 0
+	for i in 1..max
+		if player1[x] == player2[x]
+			x +=1
+		else
+			$ply1sym = player1[x].upcase
+			$ply2sym = player2[x].upcase
+		end
+	end
 end
 
 def symbol(players)
@@ -539,17 +560,12 @@ def startgame(cpu = false)
 	File.new("highscore.txt","r")
 	@array = ["1","2","3","4","5","6","7","8","9"]
 	$wins = ""
-	if !cpu
-		maxrounds = 9
-	else
-		maxrounds = 5
-	end
 	x = 0
 	ueber = false
 	wrong = false
 	array = @array
 	if cpu
-		name1 = names(1).chop
+		name1 = names(1)
 		name2 = "CPU"
 		maxturn = 5
 		turn2 = name1
@@ -557,11 +573,10 @@ def startgame(cpu = false)
 		turn = $ply1sym
 	else
 		nam = names(2)
-		name1 = nam[0].chop
-		name2 = nam[1].chop
+		name1 = nam[0]
+		name2 = nam[1]
 		maxturn = 9
 		turn2 = name2
-		symbol(2)
 		turn = $ply2sym
 	end
 	if eingabe == 2
@@ -577,7 +592,7 @@ def startgame(cpu = false)
 			end
 		end
 		if $wins == ""
-			if x == maxturn
+			if x >= maxturn
 				puts "Unentschieden!"
 				puts "Noch eine Runde spielen? ja/nein"
 				eingabe = gets.chop
