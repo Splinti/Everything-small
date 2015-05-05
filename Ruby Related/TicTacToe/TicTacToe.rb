@@ -45,7 +45,6 @@ def ausgabe(x)
 end
 
 def design(str)
-	hash = "#".red
 	max = 30
 	if str.length%2 == 0
 		spaces = ((max-str.length)/2)-1
@@ -54,13 +53,13 @@ def design(str)
 		spaces = ((max-str.length)/2)
 		spaces2 = ((max-str.length)/2)-1
 	end
-	puts hash*max
-	puts hash + " "*(max-2) + hash
-	puts hash + " "*(max-2) + hash
-	puts hash + " "*spaces + str.green + " "*spaces2 + hash
-	puts hash + " "*(max-2) + hash
-	puts hash + " "*(max-2) + hash
-	puts hash*max
+	puts "╔".red + "═".red*(max-2) + "╗".red
+	puts "║".red + " "*(max-2) + "║".red
+	puts "║".red + " "*(max-2) + "║".red
+	puts "║".red + " "*spaces + str.green + " "*spaces2 + "║".red
+	puts "║".red + " "*(max-2) + "║".red
+	puts "║".red + " "*(max-2) + "║".red
+	puts "╚".red + "═".red*(max-2) + "╝".red
 end
 
 def mpmenu
@@ -209,23 +208,23 @@ def check(arr,name)
 end
 
 def addtable(array,del = false)
-	maxTab = 15
-	kd = (array[1].to_f/array[2].to_f).round(2)
-	if kd.infinite? then kd = array[1].to_f.round(2) end
+	maxTab = 16
+	kd = (array[1].to_f/array[2].to_f).round(1)
+	if kd.infinite? then kd = array[1].to_f.round(1) end
 	if del
 		$counter += 1
-		puts $counter.to_s + " "*(maxTab-$counter.to_s.length) + " | " + array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
+		puts $counter.to_s + " "*(maxTab-$counter.to_s.length) + " ║ " + array[0] + " "*(maxTab-array[0].length) + "║ " + array[1] + " "*(maxTab-array[1].length) + "║ " + array[2].chop + " "*(maxTab-array[2].length) + " ║ "
 	else
-		puts array[0] + " "*(maxTab-array[0].length) + " | " + array[1] + " "*(maxTab-array[1].length) + " | " + array[2].chop + " "*(maxTab-array[2].length) + " | " + kd.to_s
+		puts array[0] + " "*(maxTab-array[0].length) + " ║ " + array[1] + " "*(maxTab-array[1].length) + "║ " + array[2].chop + " "*(maxTab-array[2].length) + " ║ " + kd.to_s + " "*(maxTab-4) + " ║ "
 	end
 end
 
 def bestmenu
 	system("cls")
-	design("Bestenliste - Menue")
+	design("Bestenliste")
 	puts
 	puts "1 - Bestenliste anzeigen"
-	puts "2 - Bestenlisten-eintrag loeschen"
+	puts "2 - Bestenlisten-Eintrag loeschen"
 	puts
 	puts "0 - Zurueck"
 	print "Eingabe: "
@@ -251,8 +250,9 @@ def modifybest
 	x = 0
 	design("Bestenliste")
 	puts
-	puts "ID              | Name            | Gewonnen        | Verloren"
-	puts "-"*((20*4)-1)
+	puts "ID               ║ Name            ║ Gewonnen        ║ Verloren        ║"
+	4.times do print "═"*17 + "╬" end
+	puts
 	highscores = File.new("highscore.txt","r")
 	list = highscores.readlines
 	highscores.close
@@ -290,8 +290,9 @@ def showbest(dest = 0)
 	x = 0
 	design("Bestenliste")
 	puts
-	puts "Name            | Gewonnen        | Verloren       | Gewinnrate"
-	puts "-"*((20*4)-1)
+	puts " Name            ║ Gewonnen        ║ Verloren        ║ Gewinnrate      ║"
+	4.times do print "═"*17 + "╬" end
+	puts
 	highscores = File.new("highscore.txt","r")
 	list = highscores.readlines
 	highscores.close
@@ -604,7 +605,8 @@ def startgame(cpu = false)
 				end
 			end
 		else
-			if turn2 == name1 then turn2 = name2 else turn2 = name1 end
+			if !cpu then if turn2 == name1 then turn2 = name2 else turn2 = name1 end end
+			if cpu then if $wins == "O" then turn2 = name2 else turn2 = name1 end end
 			if turn2 == name1
 				writebest(name1,1,0)
 				writebest(name2,0,1)
@@ -612,7 +614,6 @@ def startgame(cpu = false)
 				writebest(name1,0,1)
 				writebest(name2,1,0)
 			end
-			if cpu then if $wins == "O" then turn2 = name2 else turn2 = name1 end end
 			puts "#{turn2} hat das Spiel gewonnen!"
 			puts "Noch eine Runde spielen? ja/nein"
 			eingabe = gets.chop
