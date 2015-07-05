@@ -7,6 +7,19 @@ It's a small script for the program called "Livestreamer" which is easier to use
 
 
 ##Ruby Related
+###Splintbot
+A small TwitchTV Chat moderation bot.
+Usage:
+```Shell
+ruby bot_main.rb "#ChannelName"
+```
+e.g.
+```Shell
+ruby bot_main.rb "#splinti98"
+```
+
+
+
 ###PWGen
 This small tool will generate a password for you. Config and other languages will come later.
 Gems needed:
