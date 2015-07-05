@@ -1,0 +1,9 @@
+{
+  "users": {
+    "testname": {
+      "displayname": "#testname",
+      "rank": "Global Elite",
+      "points": 500000
+    }
+  }
+}
