@@ -82,3 +82,4 @@ while @length > 0
 end
 puts @string_end_finished
 puts pw
+gets
