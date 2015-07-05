@@ -45,6 +45,7 @@ def ausgabe(x)
 end
 
 def design(str)
+	hash = "#".red
 	max = 30
 	if str.length%2 == 0
 		spaces = ((max-str.length)/2)-1
@@ -270,7 +271,7 @@ def modifybest
 		bestmenu
 	elsif eingabe =~ /[0-9]/
 		list.delete_at(eingabe.to_i-1)
-		savefile(list)
+		savefile(@sorted)
 	else
 		modifybest
 	end
@@ -299,7 +300,10 @@ def showbest(dest = 0)
 	files = list.flatten
 	files.each do |stat|
     	@sorted = @sorted + [stat.to_s.split(",")]
-		addtable(@sorted[y])
+	end
+	@sorted.sort! {|a,b| b[1] <=> a[1]}
+	@sorted.each do |stat|
+		addtable(stat)
 		y += 1
 	end
 	puts
@@ -501,7 +505,9 @@ def startmp(id)
 					x += 1
 					@array = setzen(array,eingabe.to_i,turn)
 					ueber = false
-					sendmsg(eingabe.to_i)
+					if x < maxturn
+						sendmsg(eingabe.to_i)
+					end
 					$id = 2
 				end
 			else
