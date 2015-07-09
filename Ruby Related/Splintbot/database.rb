@@ -3,7 +3,7 @@ require 'net/http'
 require 'thread'
 
 class Database
-	def initialize(channel = "#myroxx1337")
+	def initialize(channel)
 		$channel = channel
 		$dbname = "#{$channel[1..-1]}_DB.json"
 		$defaultTemplate = JSON.parse(File.read("database.json"))

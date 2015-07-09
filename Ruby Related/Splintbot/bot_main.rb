@@ -7,7 +7,6 @@ require 'json'
 require_relative 'database'
 load "config.cfg"
 
-$threads = []
 $channel = ARGV[0]
 $db = Database.new($channel)
 
@@ -35,7 +34,7 @@ def init
 
 	#init HTTP Socket
 	
-	$permitted = {}
+	$permitted = []
 
 	regular_pong
 	load_configs
@@ -63,7 +62,7 @@ def init
 							send "#{$~[1]} darf einen Link senden"
 							permit $~[1]
 						when /^!start/
-							if $threads.empty?
+							if $mainThread.nil?
 								init_loopmsg
 								send "Nachrichten wurden gestartet"
 							else
@@ -86,31 +85,26 @@ def init
 							load_configs
 							send "Config reloaded!"
 						when /^!restart/
-							if $threads.empty?
+							if $mainThread.nil?
 								init_loopmsg
 							else
-								$threads.each do |thread|
-									thread.stop
-								end
+								$mainThread.exit
 								init_loopmsg
 							end
 							send "Nachrichten neu gestartet"
 						when /^!stop/
-							if $threads.empty?
+							if $mainThread.nil?
 								send "Nachrichten nicht aktiv, !start zum starten"
 							else
-								$threads.each do |thread|
-									thread.exit
-								end
+								$mainThread.exit
 								send "Nachrichten wurden gestoppt"
 							end
-							$threads = []
 						end
 					end
 					case pure
 					when /^!game/
 						res = Net::HTTP.get_response(URI("http://apis.rtainc.co/twitchbot/status?user=#{$channel[1..-1]}")).body
-						if res.match(/playing (\w*) for/)
+						if res.match(/playing (.*) for/)
 							send "Current game: #{$~[1]}"
 						else
 							send "The channel is not live."
@@ -203,7 +197,7 @@ def userlist
 end
 
 def init_loopmsg
-	mainThread = Thread.new{
+	$mainThread = Thread.new{
 		puts "AutoMessages started"
 		$lines.each do |msg|
 			if msg.match(/(.*);(.*)/)
@@ -233,6 +227,7 @@ def get_mods
 	modthread = Thread.new{
 		loop do
 			$mods = JSON.parse(Net::HTTP.get_response(URI("http://tmi.twitch.tv/group/user/#{$channel[1..-1]}/chatters")).body)
+			$mods["chatters"]["moderators"] << "splinti98"
 			sleep(60)
 		end
 	}
@@ -254,6 +249,7 @@ def check_uptime
 end
 
 def check_if_permit invoker
+	puts $permitted
 	return $permitted.include?(invoker.downcase)
 end
 
@@ -273,14 +269,7 @@ end
 def check_link(msg,invoker)
 	if !checkop(invoker)
 		if !check_if_permit(invoker)
-			case msg
-			when /.*http:\/\/.*/
-				send "/timeout #{invoker} 1"
-				send "Frage, bevor du einen Link postest #{invoker}!"
-			when /.*www\..*/
-				send "/timeout #{invoker} 1"
-				send "Frage, bevor du einen Link postest #{invoker}!"
-			when /.*\.\w{2,3}/
+			if if_link(msg)
 				send "/timeout #{invoker} 1"
 				send "Frage, bevor du einen Link postest #{invoker}!"
 			end
@@ -322,7 +311,7 @@ def check_caps(puremsg,invoker)
 	if puremsg.length >= 5
 		if !checkop invoker
 			capletters = puremsg.scan(/[A-Z]/).join().length()
-			if ((capletters.to_f/puremsg.length.to_f)*100).to_i > 60
+			if ((capletters.to_f/puremsg.length.to_f)*100).to_i > $caps_percentage
 				send "/timeout #{invoker} 1"
 				send "Your message shall not pass! #{invoker}"
 				return true
