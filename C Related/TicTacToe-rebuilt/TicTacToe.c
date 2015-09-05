@@ -1,12 +1,22 @@
 #include <stdio.h>
+#include <conio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <Windows.h>
 
 #define true 1
 #define false 0
 
 char playfield[9];
+int screenWidth;
+int tabbing = 15;
+
+
+void menu();
+void writeCenter(char *string);
+void putFormat(char *string);
+char checkForInput();
 
 void initBoard(){
 	int i;
@@ -15,34 +25,92 @@ void initBoard(){
 	}
 }
 
-void menu(){
-	int input;
-	system("cls");
-	printf("Welcome to TicTacToe, my Test Programm!\n");
-	printf("1 - Play Singleplayer - 1 V 1\n");
-	printf("2 - Play Singleplayer - CPU\n");
-	printf("\n");
-	printf("0 - Exit game\n");
-	scanf("%d",&input);
-	switch(input){
-		case 1: startGame();break;
-		case 2: startGameCPU();break;
-		case 0: exit(0);break;
-		default: printf("Accessable: 1-0");sleep(1);menu();break;
+void showSplash(char *title){
+	writeCenter("###################");
+	writeCenter("");
+	writeCenter(title);
+	writeCenter("");
+	writeCenter("###################");
+	writeCenter("\n");
+}
+
+void writeCenter(char *string){
+	int spaces,i;
+	spaces = screenWidth - strlen(string);
+	for(i=0;i<spaces/2;i++){
+		printf(" ");
 	}
+	printf("%s\n",string);
+}
+void spmenu(){
+	char input;
+	system("cls");
+	putFormat("");
+	putFormat("");
+	putFormat("");
+	putFormat("1 - Play Singleplayer - 1 V 1");
+	putFormat("2 - Play Singleplayer - CPU");
+	putFormat("");
+	putFormat("0 - Return");
+	input = checkForInput();
+	switch(input){
+		case '1': startGame();break;
+		case '2': startGameCPU();break;
+
+		case '0': menu();break;
+		default: printf("Accessable: 0-2");sleep(1);break;
+	}
+}
+void menu(){
+	char input;
+	system("cls");
+	showSplash("TicTacToe");
+	putFormat("1 - Play Singleplayer");
+	putFormat("2 - Play Multiplayer");
+	putFormat("0 - Exit game");
+	input = checkForInput();
+	switch(input){
+		case '1': spmenu();break;
+		case '0': exit(0);break;
+		default: putFormat("Accessable: 1-0");sleep(1);menu();break;
+	}
+}
+
+void putFormat(char *string){
+	int i;
+	for(i=0;i<tabbing;i++){
+		printf(" ");
+	}
+	printf("%s\n",string);
 }
 
 void drawPlayField(){
 	system("cls");
 	printf("\n");
-	int i;
-	for(i = 1;i < 10 ;i++){
-		printf("[%c] ",playfield[i-1]);
-		if(i%3==0){
-			printf("\n");
-			printf("\n");
+	int i,spaces,f;
+	spaces = screenWidth - strlen("[X] ");
+	for(i = 1;i < 4 ;i++){
+		int d;
+		printf("\n");
+		printf("\n");
+		for(f=0;f<spaces/2;f++){
+			printf(" ");
 		}
+		for(d=1;d < 4;d++){
+			printf("[%c] ",playfield[d*i-1]);
+		}
+		
 	}
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+}
+
+char checkForInput(){
+	int result = getch();
+	printf("%c\n", result);
+	return (char)result;
 }
 
 int checkForWin(char turn){
@@ -88,13 +156,13 @@ int startGame(){
 	for(i = 0;i<max_rounds;i++){
 		turn = turn == 'X' ? 'O' : 'X';
 		drawPlayField();
-		printf("Which field do you want to occupy?\n");
-		scanf("%d",&input);
+		putFormat("Which field do you want to occupy?");
+		input = checkForInput();
 		while(checkAlreadyExisting(input-1)){
 			drawPlayField();
-			printf("You cannot overwrite!\n");
-			printf("Which field do you want to occupy?\n");
-			scanf("%d",&input);
+			putFormat("You cannot overwrite!");
+			putFormat("Which field do you want to occupy?");
+			input = checkForInput();
 		}
 		playfield[input-1] = turn;
 		winner = checkForWin(turn);
@@ -159,8 +227,11 @@ int startGameCPU(){
 }
 
 
-int main(){
-	menu();
+int main(int argc, char *argv[]){
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    screenWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 
+	menu();
 	return 0;
 }
